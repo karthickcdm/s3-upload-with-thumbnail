@@ -60,12 +60,13 @@ const generateThumbnailForPDF = (file) => {
       })
         .then(data /*is a buffer*/ => 
             {
-                const wstream = data.pipe(fs.createWriteStream(join(__dirname, "uploads", thumbnailName[0]+".jpg")))
+                const wstream = fs.createWriteStream(join(__dirname, "uploads", thumbnailName[0]+".jpg"))
                 wstream.on('finish', function() {
                     console.log('.jpg');
                     console.log(thumbnailName[0]+'.jpg');
                     uploadImage({originalname: thumbnailName[0]+'.jpg'});
                 })
+                data.pipe(wstream);
             })
         .catch(err => console.error(err))
       
