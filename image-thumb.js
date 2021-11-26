@@ -106,7 +106,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
         if(req.file && req.file.mimetype == 'application/pdf'){
             console.log('file type pdf supported');
             const pdfName = 'uploads/' + req.file.originalname;
-            const thumbnailName = file.originalname.split('.');
+            const thumbnailName = req.file.originalname.split('.');
             generateThumbnailForPDF(req.file);
             // uploadImage(pdfName);
             return res.status(201).json({
