@@ -3,17 +3,21 @@ const app = express();
 const path = require('path');
 const multer = require('multer');
 const sharp = require('sharp');
-const pdf = require('pdf-thumbnail');
 
 const port = 3000;
 
 const fs = require('fs');
 const AWS = require('aws-sdk');
+const { join } = require("path")
+
 const { rejects } = require('assert');
 const s3 = new AWS.S3({
   accessKeyId: 'AKIAR5GJGX34XOQ2I7VX',
   secretAccessKey: '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'
 });
+
+const pdf = require('pdf-thumbnail');
+const pdfBuffer = require('fs').readFileSync('uploads/DraftSLA_US.pdf');
 
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
@@ -29,10 +33,9 @@ const storage = multer.diskStorage({
     }
 });
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png') {
+    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png' || file.mimetype == 'application/pdf') {
         cb(null, true);
     } else {
-        uploadPDF(file);
         cb(null, false);
     }
 }
@@ -42,8 +45,27 @@ const uploadPDF = (file) => {
     
 }
 
+const generateThumbnailForPDF = (file) => {
+
+    console.log(file);
+    console.log(__dirname)
+    
+    pdf(fs.readFileSync(join(__dirname, "uploads", "DraftSLA_US.pdf")), {
+        compress: {
+          type:"JPEG",
+          quality: 70
+        }
+      })
+        .then(data /*is a buffer*/ => data.pipe(fs.createWriteStream(join(__dirname, "uploads", "previewBuffer.jpg"))).on("end", function(){
+            console.log('Stream end');
+        }))
+        .catch(err => console.error(err))
+      
+
+}
+
 const uploadImage = (file) =>{
-    console.log("file.originalname");
+    console.log("Uploading file");
     console.log(file.originalname);
     const fileName = 'uploads/' + file.originalname;
     const readStream = fs.createReadStream(fileName);
@@ -77,22 +99,43 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 //Upload route
 app.post('/upload', upload.single('image'), (req, res, next) => {
+    console.log(req.file);
     try {
-        sharp(req.file.path).resize(200, 200).toFile('uploads/' + 'thumbnails-'+ req.file.originalname, (err, resizeImage) => {
-            if (err) {
-                console.log(err);
-            } else {
-                const fileName = {originalname: 'thumbnails-' + req.file.originalname};
-                uploadImage(fileName);
-                return res.status(201).json({
-                    message: 'File uploded successfully',
-                    imageUrl: url+req.file.originalname,
-                    thumbnailUrl: url+'thumbnails-'+req.file.originalname
-                    // data: data
-                });
+        if(req.file && req.file.mimetype == 'application/pdf'){
+            console.log('file type pdf supported');
+            const pdfName = 'uploads/' + req.file.originalname;
+            generateThumbnailForPDF(req.file);
+            // uploadImage(pdfName);
+            return res.status(201).json({
+                message: 'File type (PDF) supported'
+            });
+        } else if (req.file && (req.file.mimetype == 'image/jpeg' || req.file.mimetype == 'image/png') ) {
+            console.log('file type supported');
+            sharp(req.file.path).resize(200, 200).toFile('uploads/' + 'thumbnails-'+ req.file.originalname, (err, resizeImage) => {
+                if (err) {
+                    console.log('Err in generating thumbanil');
+                    console.log(err);
+                    return res.status(201).json({
+                        message: 'Error in generating thumbnail, file uploaded'
+                    });
+                } else {
+                    const fileName = {originalname: 'thumbnails-' + req.file.originalname};
+                    uploadImage(fileName);
+                    return res.status(201).json({
+                        message: 'File uploded successfully',
+                        imageUrl: url+req.file.originalname,
+                        thumbnailUrl: url+'thumbnails-'+req.file.originalname
+                    });
 
-            }
-        })
+                }
+            })
+            
+        } else {
+            console.log('file type not supported');
+            return res.status(201).json({
+                message: 'File type not supported'
+            });
+        }
         
     } catch (error) {
         console.error(error);
