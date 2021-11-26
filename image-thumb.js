@@ -106,12 +106,13 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
         if(req.file && req.file.mimetype == 'application/pdf'){
             console.log('file type pdf supported');
             const pdfName = 'uploads/' + req.file.originalname;
+            const thumbnailName = file.originalname.split('.');
             generateThumbnailForPDF(req.file);
             // uploadImage(pdfName);
             return res.status(201).json({
                 message: 'File (PDF) uploded successfully',
                 fileUrl: url+req.file.originalname,
-                thumbnailUrl: url+'thumbnails-'+req.file.originalname
+                thumbnailUrl: url+'thumbnails-'+thumbnailName[0]+'.jpg'
             });
         } else if (req.file && (req.file.mimetype == 'image/jpeg' || req.file.mimetype == 'image/png') ) {
             console.log('file type supported');
