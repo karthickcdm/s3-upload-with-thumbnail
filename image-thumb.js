@@ -47,7 +47,9 @@ const uploadPDF = (file) => {
 
 const generateThumbnailForPDF = (file) => {
 
-    console.log(file);
+    const thumbnailName = file.originalname.split('.');
+    console.log('PDF upload');
+    console.log(thumbnailName[0]);
     console.log(__dirname)
     
     pdf(fs.readFileSync(join(__dirname, "uploads", file.originalname)), {
@@ -56,7 +58,7 @@ const generateThumbnailForPDF = (file) => {
           quality: 70
         }
       })
-        .then(data /*is a buffer*/ => data.pipe(fs.createWriteStream(join(__dirname, "uploads", file.originalname+".jpg"))).on("end", function(){
+        .then(data /*is a buffer*/ => data.pipe(fs.createWriteStream(join(__dirname, "uploads", thumbnailName[0]+".jpg"))).on("end", function(){
             console.log('Stream end');
         }))
         .catch(err => console.error(err))
