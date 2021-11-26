@@ -50,13 +50,13 @@ const generateThumbnailForPDF = (file) => {
     console.log(file);
     console.log(__dirname)
     
-    pdf(fs.readFileSync(join(__dirname, "uploads", "DraftSLA_US.pdf")), {
+    pdf(fs.readFileSync(join(__dirname, "uploads", file.originalname)), {
         compress: {
           type:"JPEG",
           quality: 70
         }
       })
-        .then(data /*is a buffer*/ => data.pipe(fs.createWriteStream(join(__dirname, "uploads", "previewBuffer.jpg"))).on("end", function(){
+        .then(data /*is a buffer*/ => data.pipe(fs.createWriteStream(join(__dirname, "uploads", file.originalname+".jpg"))).on("end", function(){
             console.log('Stream end');
         }))
         .catch(err => console.error(err))
@@ -107,7 +107,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
             generateThumbnailForPDF(req.file);
             // uploadImage(pdfName);
             return res.status(201).json({
-                message: 'File type (PDF) supported',
+                message: 'File (PDF) uploded successfully',
                 fileUrl: url+req.file.originalname,
                 thumbnailUrl: url+'thumbnails-'+req.file.originalname
             });
@@ -124,7 +124,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
                     const fileName = {originalname: 'thumbnails-' + req.file.originalname};
                     uploadImage(fileName);
                     return res.status(201).json({
-                        message: 'File uploded successfully',
+                        message: 'File (image) uploded successfully',
                         fileUrl: url+req.file.originalname,
                         thumbnailUrl: url+'thumbnails-'+req.file.originalname
                     });
