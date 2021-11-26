@@ -17,6 +17,7 @@ const s3 = new AWS.S3({
 
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
+const url = "https://tribez-backend-app.s3.ap-south-1.amazonaws.com/";
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -36,7 +37,6 @@ const fileFilter = (req, file, cb) => {
     }
 }
 
-
 const uploadPDF = (file) => {
     console.log(file);
     
@@ -49,8 +49,9 @@ const uploadImage = (file) =>{
     const readStream = fs.createReadStream(fileName);
     const params = {
         Bucket: 'tribez-backend-app',
-        Key: Date.now()+'-'+file.originalname,
-        Body: readStream
+        Key: file.originalname,
+        Body: readStream,
+        ACL:'public-read'
     };
 
     return new Promise((resolve, reject) => {
@@ -63,6 +64,7 @@ const uploadImage = (file) =>{
           }
           
           console.log("done");
+          console.log(data);
           return resolve(data);
         });
       });
@@ -80,32 +82,14 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
             if (err) {
                 console.log(err);
             } else {
-                const fileName = 'uploads/' + 'thumbnails-' + req.file.originalname;
-                const readStream = fs.createReadStream(fileName);
-                const params = {
-                    Bucket: 'tribez-backend-app',
-                    Key: fileName,
-                    Body: readStream
-                };
-
-                return new Promise((resolve, reject) => {
-                    s3.upload(params, function(err, data) {
-                    readStream.destroy();
-                    
-                    if (err) {
-                        console.log("err");
-                        return reject(err);
-                    }
-                    
-                    return res.status(201).json({
-                        message: 'File uploded successfully'
-                    });
-                    return resolve(data);
-                    
-                    });
+                const fileName = {originalname: 'thumbnails-' + req.file.originalname};
+                uploadImage(fileName);
+                return res.status(201).json({
+                    message: 'File uploded successfully',
+                    imageUrl: url+req.file.originalname,
+                    thumbnailUrl: url+'thumbnails-'+req.file.originalname
+                    // data: data
                 });
-
-                
 
             }
         })
