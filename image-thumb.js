@@ -107,7 +107,9 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
             generateThumbnailForPDF(req.file);
             // uploadImage(pdfName);
             return res.status(201).json({
-                message: 'File type (PDF) supported'
+                message: 'File type (PDF) supported',
+                fileUrl: url+req.file.originalname,
+                thumbnailUrl: url+'thumbnails-'+req.file.originalname
             });
         } else if (req.file && (req.file.mimetype == 'image/jpeg' || req.file.mimetype == 'image/png') ) {
             console.log('file type supported');
@@ -123,7 +125,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
                     uploadImage(fileName);
                     return res.status(201).json({
                         message: 'File uploded successfully',
-                        imageUrl: url+req.file.originalname,
+                        fileUrl: url+req.file.originalname,
                         thumbnailUrl: url+'thumbnails-'+req.file.originalname
                     });
 
