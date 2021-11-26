@@ -58,11 +58,14 @@ const generateThumbnailForPDF = (file) => {
           quality: 70
         }
       })
-        .then(data /*is a buffer*/ => data.pipe(fs.createWriteStream(join(__dirname, "uploads", thumbnailName[0]+".jpg"))).on("end", function(){
-            console.log('Stream end');
-            var thumbFile = {originalname: thumbnailName[0]+".jpg"};
-            uploadImage(thumbFile);
-        }))
+        .then(data /*is a buffer*/ => 
+            {
+                data.pipe(fs.createWriteStream(join(__dirname, "uploads", thumbnailName[0]+".jpg")))
+                console.log('.jpg');
+                console.log(thumbnailName[0]+'.jpg');
+                uploadImage({originalname: thumbnailName[0]+'.jpg'});
+        
+            })
         .catch(err => console.error(err))
       
 
