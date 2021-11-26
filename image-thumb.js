@@ -4,7 +4,7 @@ const path = require('path');
 const multer = require('multer');
 const sharp = require('sharp');
 
-const port = 3000;
+const port = 3100;
 
 const fs = require('fs');
 const AWS = require('aws-sdk');
