@@ -3,6 +3,7 @@ const app = express();
 const path = require('path');
 const multer = require('multer');
 const sharp = require('sharp');
+const generatePreview = require('ffmpeg-generate-video-preview')
 
 const { 
     v1: uuidv1,
@@ -39,13 +40,25 @@ const storage = multer.diskStorage({
     }
 });
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png' || file.mimetype == 'application/pdf') {
+    console.log(file.mimetype);
+    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png' || file.mimetype == 'application/pdf' || file.mimetype.includes('video')) {
         cb(null, true);
     } else {
         cb(null, false);
     }
 }
 
+const generateVideoPreview = async (file) => {
+    console.log('Video file found - ', file);
+    const metadata = await generatePreview({
+        input: 'uploads/'+file.originalname,
+        output: 'preview.gif',
+        width: 128
+      })
+       
+      console.log(metadata)
+
+}
 
 const generateThumbnailForPDF = (file) => {
 
@@ -68,7 +81,6 @@ const generateThumbnailForPDF = (file) => {
                 data.pipe(wstream);
             })
         .catch(err => console.error(err))
-      
 
 }
 
@@ -117,6 +129,7 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 //Upload route
 app.post('/upload', upload.single('image'), (req, res, next) => {
+    console.log('File details - ',req.file);
     try {
         if(req.file && req.file.mimetype == 'application/pdf'){
             uploadImage(req.file, 'original');
@@ -150,7 +163,14 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
                 }
             })
             
-        } else {
+        } else if(req.file && (req.file.mimetype.includes('video'))) {
+            generateVideoPreview(req.file);
+            return res.status(201).json({
+                message: 'File (video) uploaded successfully',
+                fileUrl: url+uuid+'-'+req.file.originalname,
+                thumbnailUrl: url+'thumbnail-'+uuid+'-'+req.file.originalname
+            })
+        }else {
             //console.log('file type not supported');
             return res.status(201).json({
                 message: 'File type not supported'
