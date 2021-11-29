@@ -51,13 +51,12 @@ const fileFilter = (req, file, cb) => {
 const generateVideoPreview = async (file) => {
     console.log('Video file found - ', file);
     const metadata = await generatePreview({
-        input: 'uploads/'+file.originalname,
+        input: 'uploads/'+uuid+'-'+file.originalname,
         output: 'preview.gif',
         width: 128
       })
        
       console.log(metadata)
-
 }
 
 const generateThumbnailForPDF = (file) => {
