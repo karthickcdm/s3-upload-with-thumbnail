@@ -186,6 +186,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
         } else if(req.file && (req.file.mimetype.includes('video'))) {
             uploadImage(req.file, 'original');
             generateVideoPreview(req.file);
+            const thumbnailName = req.file.originalname.split('.');
             return res.status(201).json({
                 message: 'File (video) uploaded successfully',
                 fileUrl: url+uuid+'-'+req.file.originalname,
