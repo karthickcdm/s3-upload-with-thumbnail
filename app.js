@@ -71,7 +71,12 @@ const generateVideoPreview = async (file) => {
         scale: 180, //the smaller the number, the smaller the thumbnail
         speedMultiple: 4, //this is 4x speed
         deletePalette: true //to delete the palettefile that was generated to create the gif once gif is created 
+     }, (err, result) => {
+         console.log(err);
+         console.log(result);
      });
+
+
 }
 
 const generateThumbnailForPDF = (file) => {
