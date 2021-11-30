@@ -66,17 +66,13 @@ const generateVideoPreview = async (file) => {
         // tmpDir: '/some/writeable/directory' //only required if you can't write to /tmp/ and you need to generate gifs
       });
 
-      tg.generateGif({
-        fps: 0.75, //how many frames per second you want in your gif
-        scale: 180, //the smaller the number, the smaller the thumbnail
-        speedMultiple: 4, //this is 4x speed
-        deletePalette: true //to delete the palettefile that was generated to create the gif once gif is created 
-     }, (err, result) => {
-         console.log(err);
-         console.log(result);
-     });
+   
+     tg.generateGifCb((err, result) => {
+        console.log(result);
+        // '/full/path/to/video-1493133602092.gif'
+      })
 
-
+     
 }
 
 const generateThumbnailForPDF = (file) => {
