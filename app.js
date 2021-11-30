@@ -51,6 +51,7 @@ const fileFilter = (req, file, cb) => {
 }
 
 const generateVideoPreview = async (file) => {
+    const thumbnailName = file.originalname.split('.');
     console.log('Video file found - ', file);
     // const metadata = await generatePreview({
     //     input: 'uploads/'+uuid+'-'+file.originalname,
@@ -69,7 +70,7 @@ const generateVideoPreview = async (file) => {
    
      tg.generateGifCb((err, result) => {
         console.log(result);
-        fs.rename(result, 'uploads/'+uuid+'-'+file.originalname, ()=> {
+        fs.rename(result, 'uploads/'+'thumbnail-'+uuid+'-'+thumbnailName[0]+".gif", ()=> {
             console.log('file renamed');
         })
         // '/full/path/to/video-1493133602092.gif'
