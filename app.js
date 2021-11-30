@@ -189,7 +189,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
             return res.status(201).json({
                 message: 'File (video) uploaded successfully',
                 fileUrl: url+uuid+'-'+req.file.originalname,
-                thumbnailUrl: url+'thumbnail-'+uuid+'-'+req.file.originalname
+                thumbnailUrl: url+'thumbnail-'+uuid+'-'+thumbnailName[0]+'.gif'
             })
         }else {
             //console.log('file type not supported');
