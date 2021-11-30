@@ -4,6 +4,8 @@ const path = require('path');
 const multer = require('multer');
 const sharp = require('sharp');
 const generatePreview = require('ffmpeg-generate-video-preview')
+const ThumbnailGenerator = require('video-thumbnail-generator').default;
+
 
 const { 
     v1: uuidv1,
@@ -50,13 +52,26 @@ const fileFilter = (req, file, cb) => {
 
 const generateVideoPreview = async (file) => {
     console.log('Video file found - ', file);
-    const metadata = await generatePreview({
-        input: 'uploads/'+uuid+'-'+file.originalname,
-        output: 'preview.gif',
-        width: 128
-      })
+    // const metadata = await generatePreview({
+    //     input: 'uploads/'+uuid+'-'+file.originalname,
+    //     output: 'preview.gif',
+    //     width: 128
+    //   })
        
-      console.log(metadata)
+    //   console.log(metadata)
+
+      const tg = new ThumbnailGenerator({
+        sourcePath: 'uploads/'+uuid+'-'+file.originalname,
+        thumbnailPath: 'uploads/',
+        // tmpDir: '/some/writeable/directory' //only required if you can't write to /tmp/ and you need to generate gifs
+      });
+
+      tg.generateGif({
+        fps: 0.75, //how many frames per second you want in your gif
+        scale: 180, //the smaller the number, the smaller the thumbnail
+        speedMultiple: 4, //this is 4x speed
+        deletePalette: true //to delete the palettefile that was generated to create the gif once gif is created 
+     });
 }
 
 const generateThumbnailForPDF = (file) => {
