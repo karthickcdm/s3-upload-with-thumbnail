@@ -69,6 +69,9 @@ const generateVideoPreview = async (file) => {
    
      tg.generateGifCb((err, result) => {
         console.log(result);
+        fs.rename(result, 'uploads/'+uuid+'-'+file.originalname, ()=> {
+            console.log('file renamed');
+        })
         // '/full/path/to/video-1493133602092.gif'
       })
 
