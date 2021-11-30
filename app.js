@@ -50,7 +50,7 @@ const fileFilter = (req, file, cb) => {
     }
 }
 
-const generateVideoPreview = async (file) => {
+const generateVideoPreview = (file) => {
     const thumbnailName = file.originalname.split('.');
     console.log('Video file found - ', file);
     // const metadata = await generatePreview({
@@ -72,6 +72,7 @@ const generateVideoPreview = async (file) => {
         console.log(result);
         fs.rename(result, 'uploads/'+'thumbnail-'+uuid+'-'+thumbnailName[0]+".gif", ()=> {
             console.log('file renamed');
+            uploadImage({originalname: thumbnailName[0]+'.gif'}, 'thumbnail');
         })
         // '/full/path/to/video-1493133602092.gif'
       })
@@ -134,7 +135,7 @@ const uploadImage = (file, type) =>{
             return reject(err);
           }
           
-          //console.log("done");
+          console.log("File Uploaded successfully");
           console.log(data);
           return resolve(data);
         });
@@ -183,6 +184,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
             })
             
         } else if(req.file && (req.file.mimetype.includes('video'))) {
+            uploadImage(req.file, 'original');
             generateVideoPreview(req.file);
             return res.status(201).json({
                 message: 'File (video) uploaded successfully',
