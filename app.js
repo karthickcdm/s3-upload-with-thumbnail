@@ -5,6 +5,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const generatePreview = require('ffmpeg-generate-video-preview')
 const ThumbnailGenerator = require('video-thumbnail-generator').default;
+var cors = require('cors')
 
 
 const { 
@@ -30,6 +31,7 @@ const pdf = require('pdf-thumbnail');
 const uuid = uuidv1();
 
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+app.use(cors());
 
 const url = "https://tribez-backend-app.s3.ap-south-1.amazonaws.com/";
 

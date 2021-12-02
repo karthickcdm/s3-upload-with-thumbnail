@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.1036.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "ffmpeg-generate-video-preview": "^1.0.3",
     "file-type": "^17.0.0",
